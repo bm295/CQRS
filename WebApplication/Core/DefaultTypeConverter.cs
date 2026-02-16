@@ -11,7 +11,10 @@ namespace WebApplication.Core
 
         public DefaultTypeConverter(Type type)
         {
-            Guard.NotNull(type, nameof(type));]
+            Guard.NotNull(type, nameof(type));
+            _type = type;
+            _typeIsConvertible = typeof(IConvertible).IsAssignableFrom(type);
+            _systemConverter = new Lazy<TypeConverter>(() => TypeDescriptor.GetConverter(type));
         }
 
         public TypeConverter SystemConverter

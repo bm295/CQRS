@@ -1,4 +1,4 @@
-var builder = WebApplication.CreateBuilder(args);
+var builder = global::Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
