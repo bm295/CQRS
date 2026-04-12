@@ -1,0 +1,56 @@
+@model WebApplication.Application.Commands.CreateChangeRequestCommand
+@{
+    ViewData["Title"] = "New Change";
+}
+
+<section class="hero">
+    <h1>Create Infrastructure Change Request</h1>
+    <p class="muted">This page creates the write model through a command endpoint. Reads for detail and dashboard pages come from the projected read store.</p>
+</section>
+
+<section class="panel" style="margin-top: 1rem;">
+    <form asp-controller="InfraChangeCommands" asp-action="Create" method="post" class="forms">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="grid grid-2">
+            <div class="field">
+                <label asp-for="Title"></label>
+                <input asp-for="Title" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="SystemName"></label>
+                <input asp-for="SystemName" />
+                <span asp-validation-for="SystemName" class="text-danger"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="Environment"></label>
+                <select asp-for="Environment">
+                    <option value="dev">dev</option>
+                    <option value="staging">staging</option>
+                    <option value="prod">prod</option>
+                </select>
+                <span asp-validation-for="Environment" class="text-danger"></span>
+            </div>
+
+            <div class="field">
+                <label asp-for="RequestedBy"></label>
+                <input asp-for="RequestedBy" />
+                <span asp-validation-for="RequestedBy" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <button type="submit">Create Request</button>
+            <a class="button button-secondary" asp-controller="InfraPages" asp-action="Dashboard">Back to Dashboard</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/site.js" asp-append-version="true"></script>
+}

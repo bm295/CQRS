@@ -1,0 +1,93 @@
+@model WebApplication.ViewModels.DashboardPageVm
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<section class="hero">
+    <h1>Operations Dashboard</h1>
+    <p class="muted">Fast reads only. Summary and lists come from projected read models updated by write-side handlers.</p>
+    <div class="action-row">
+        <a class="button" asp-controller="InfraPages" asp-action="Create">Create Change Request</a>
+        <a class="button button-secondary" href="/infra/changes/summary">Summary API</a>
+    </div>
+</section>
+
+<section class="grid grid-3" style="margin-top: 1rem;">
+    <article class="metric">
+        <span class="metric-label">Pending Approvals</span>
+        <span class="metric-value">@Model.Summary.PendingApprovals</span>
+        <span class="metric-note">Awaiting approval action</span>
+    </article>
+    <article class="metric">
+        <span class="metric-label">Scheduled Changes</span>
+        <span class="metric-value">@Model.Summary.ScheduledChanges</span>
+        <span class="metric-note">Approved and time-boxed</span>
+    </article>
+    <article class="metric">
+        <span class="metric-label">Failed Changes</span>
+        <span class="metric-value">@Model.Summary.FailedChanges</span>
+        <span class="metric-note">Projection refreshed @Model.Summary.LastProjectedAtUtc.ToString("u")</span>
+    </article>
+</section>
+
+<section class="grid grid-2" style="margin-top: 1rem;">
+    <article class="panel">
+        <h2>Pending Approval Queue</h2>
+        <div class="timeline">
+            @if (Model.PendingApprovals.Count == 0)
+            {
+                <div class="timeline-item">No pending approvals.</div>
+            }
+            else
+            {
+                @foreach (var item in Model.PendingApprovals.Take(5))
+                {
+                    <div class="timeline-item">
+                        <strong><a asp-controller="InfraPages" asp-action="Details" asp-route-id="@item.Id">@item.Title</a></strong><br />
+                        @item.SystemName / @item.Environment / @item.RequestedBy
+                    </div>
+                }
+            }
+        </div>
+    </article>
+
+    <article class="panel">
+        <h2>Scheduled Changes</h2>
+        <div class="timeline">
+            @if (Model.ScheduledChanges.Count == 0)
+            {
+                <div class="timeline-item">No scheduled changes.</div>
+            }
+            else
+            {
+                @foreach (var item in Model.ScheduledChanges.Take(5))
+                {
+                    <div class="timeline-item">
+                        <strong><a asp-controller="InfraPages" asp-action="Details" asp-route-id="@item.Id">@item.Title</a></strong><br />
+                        @item.ScheduledAtUtc.ToString("u") / @item.SystemName / approved by @item.ApprovedBy
+                    </div>
+                }
+            }
+        </div>
+    </article>
+</section>
+
+<section class="panel" style="margin-top: 1rem;">
+    <h2>Recent Failures</h2>
+    <div class="timeline">
+        @if (Model.FailedChanges.Count == 0)
+        {
+            <div class="timeline-item">No failed changes.</div>
+        }
+        else
+        {
+            @foreach (var item in Model.FailedChanges.Take(5))
+            {
+                <div class="timeline-item">
+                    <strong><a asp-controller="InfraPages" asp-action="Details" asp-route-id="@item.Id">@item.Title</a></strong><br />
+                    @item.FailureReason
+                </div>
+            }
+        }
+    </div>
+</section>

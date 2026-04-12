@@ -1,4 +1,8 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+document.querySelectorAll("[data-confirm]").forEach((element) => {
+  element.addEventListener("submit", (event) => {
+    const message = element.getAttribute("data-confirm");
+    if (message && !window.confirm(message)) {
+      event.preventDefault();
+    }
+  });
+});

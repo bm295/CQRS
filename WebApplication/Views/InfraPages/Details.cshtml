@@ -1,0 +1,108 @@
+@using WebApplication.Domain
+@model WebApplication.ViewModels.ChangeRequestDetailPageVm
+@{
+    ViewData["Title"] = "Change Details";
+    var details = Model.Details;
+}
+
+<section class="hero">
+    <h1>@details.Title</h1>
+    <p class="muted">@details.SystemName in <strong>@details.Environment</strong></p>
+    <div class="action-row">
+        <span class="status-badge">@details.Status</span>
+        <a class="button button-secondary" href="/infra/changes/@details.Id">Query API</a>
+    </div>
+</section>
+
+<div class="grid grid-2" style="margin-top: 1rem;">
+    <section class="panel">
+        <h2>Request Snapshot</h2>
+        <div class="timeline">
+            <div class="timeline-item"><strong>Requested By</strong><br />@details.RequestedBy</div>
+            <div class="timeline-item"><strong>Approved By</strong><br />@(details.ApprovedBy ?? "Not approved yet")</div>
+            <div class="timeline-item"><strong>Scheduled At UTC</strong><br />@(details.ScheduledAtUtc?.ToString("u") ?? "Not scheduled")</div>
+            <div class="timeline-item"><strong>Failure / Rejection Reason</strong><br />@(details.FailureReason ?? "None")</div>
+            <div class="timeline-item"><strong>Created</strong><br />@details.CreatedAtUtc.ToString("u")</div>
+            <div class="timeline-item"><strong>Updated</strong><br />@details.UpdatedAtUtc.ToString("u")</div>
+        </div>
+    </section>
+
+    <section class="panel actions">
+        <h2>Available Commands</h2>
+
+        @if (details.Status == ChangeStatus.Draft)
+        {
+            <form asp-controller="InfraChangeCommands" asp-action="Submit" asp-route-id="@details.Id" method="post" data-confirm="Submit this draft for approval?">
+                @Html.AntiForgeryToken()
+                <button type="submit">Submit for Approval</button>
+            </form>
+        }
+
+        @if (details.Status == ChangeStatus.PendingApproval)
+        {
+            <form asp-controller="InfraChangeCommands" asp-action="Approve" asp-route-id="@details.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="field">
+                    <label asp-for="ApproveCommand.ApprovedBy">Approver</label>
+                    <input asp-for="ApproveCommand.ApprovedBy" />
+                </div>
+                <button type="submit">Approve</button>
+            </form>
+
+            <form asp-controller="InfraChangeCommands" asp-action="Reject" asp-route-id="@details.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="field">
+                    <label asp-for="RejectCommand.ApprovedBy">Approver</label>
+                    <input asp-for="RejectCommand.ApprovedBy" />
+                </div>
+                <div class="field">
+                    <label asp-for="RejectCommand.Reason">Rejection Reason</label>
+                    <textarea asp-for="RejectCommand.Reason"></textarea>
+                </div>
+                <button type="submit" class="button-danger">Reject</button>
+            </form>
+        }
+
+        @if (details.Status == ChangeStatus.Approved)
+        {
+            <form asp-controller="InfraChangeCommands" asp-action="Schedule" asp-route-id="@details.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="field">
+                    <label asp-for="ScheduleCommand.ScheduledAtUtc">Scheduled UTC</label>
+                    <input asp-for="ScheduleCommand.ScheduledAtUtc" type="datetime-local" value="@Model.ScheduleCommand.ScheduledAtUtc.ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+                <button type="submit">Schedule Execution</button>
+            </form>
+        }
+
+        @if (details.Status == ChangeStatus.Scheduled)
+        {
+            <form asp-controller="InfraChangeCommands" asp-action="Start" asp-route-id="@details.Id" method="post" data-confirm="Mark this change as started?">
+                @Html.AntiForgeryToken()
+                <button type="submit">Mark Started</button>
+            </form>
+        }
+
+        @if (details.Status == ChangeStatus.InProgress)
+        {
+            <form asp-controller="InfraChangeCommands" asp-action="Complete" asp-route-id="@details.Id" method="post" data-confirm="Mark this change as completed?">
+                @Html.AntiForgeryToken()
+                <button type="submit">Mark Completed</button>
+            </form>
+
+            <form asp-controller="InfraChangeCommands" asp-action="Fail" asp-route-id="@details.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="field">
+                    <label asp-for="FailCommand.FailureReason">Failure Reason</label>
+                    <textarea asp-for="FailCommand.FailureReason"></textarea>
+                </div>
+                <button type="submit" class="button-warning">Mark Failed</button>
+            </form>
+        }
+    </section>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/site.js" asp-append-version="true"></script>
+}

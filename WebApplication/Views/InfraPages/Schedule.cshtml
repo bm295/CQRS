@@ -1,0 +1,44 @@
+@model IReadOnlyList<WebApplication.Application.Queries.ScheduledChangeVm>
+@{
+    ViewData["Title"] = "Scheduled Changes";
+}
+
+<section class="hero">
+    <h1>Scheduled Changes</h1>
+    <p class="muted">Upcoming execution windows from the read side.</p>
+</section>
+
+<section class="panel" style="margin-top: 1rem;">
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>System</th>
+                    <th>Environment</th>
+                    <th>Approved By</th>
+                    <th>Scheduled At UTC</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr><td colspan="5">No scheduled changes.</td></tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><a asp-controller="InfraPages" asp-action="Details" asp-route-id="@item.Id">@item.Title</a></td>
+                            <td>@item.SystemName</td>
+                            <td>@item.Environment</td>
+                            <td>@item.ApprovedBy</td>
+                            <td>@item.ScheduledAtUtc.ToString("u")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

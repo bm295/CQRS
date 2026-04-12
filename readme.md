@@ -1,23 +1,43 @@
-# CarModels Demo (.NET 10 / C# 14)
+# Infrastructure Change CQRS Web App
 
-This solution targets **.NET 10** and uses **C# 14 (preview)** features.
+This solution implements the MVP from `docs/cqrs-simple-domain-plan.md` as an ASP.NET Core MVC web application with clear CQRS separation:
 
-## Mutable vs. Immutable demo
+- Write side: `Domain`, `Application/Commands`, `Infrastructure/Persistence`
+- Read side: `Application/Queries`, `Infrastructure/ReadModels`
+- Delivery: command/query HTTP routes plus Razor UI pages for dashboard, approvals, schedule, failures, create, and detail
 
-The home page includes a small demo backed by `MutabilityDemo`:
-
-- **Mutable class** (`MutableCar`) changes state in place.
-- **Immutable record** (`ImmutableCar`) uses `with` to create a new copy.
-
-## Run the demo
-
-1. Make sure you have the .NET 10 SDK installed.
-2. From the repository root, run:
+## Run
 
 ```bash
 dotnet restore
 dotnet run --project WebApplication/WebApplication.csproj
 ```
 
-3. Open the URL printed by the app (typically `https://localhost:5001` or `http://localhost:5000`).
-4. Navigate to `/` and review the **Mutable vs. Immutable Demo** section.
+Open `/infra/dashboard`.
+
+## HTTP Endpoints
+
+Commands:
+
+- `POST /infra/changes`
+- `POST /infra/changes/{id}/submit`
+- `POST /infra/changes/{id}/approve`
+- `POST /infra/changes/{id}/reject`
+- `POST /infra/changes/{id}/schedule`
+- `POST /infra/changes/{id}/start`
+- `POST /infra/changes/{id}/complete`
+- `POST /infra/changes/{id}/fail`
+
+Queries:
+
+- `GET /infra/changes/{id}`
+- `GET /infra/approvals/pending`
+- `GET /infra/changes/scheduled`
+- `GET /infra/changes/failed`
+- `GET /infra/changes/summary`
+
+## Notes
+
+- The write repository and projection store are both in-memory for the MVP.
+- Read pages are backed by projected read models, not the aggregate repository.
+- Automated tests cover aggregate transitions and a command/query workflow over the in-memory stores.
