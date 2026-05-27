@@ -1,9 +1,10 @@
+using MediatR;
 using WebApplication.Infrastructure.Persistence;
 using WebApplication.Infrastructure.ReadModels;
 
 namespace WebApplication.Application.Commands;
 
-public sealed class MarkExecutionStartedCommandHandler : ChangeRequestCommandHandlerBase
+public sealed class MarkExecutionStartedCommandHandler : ChangeRequestCommandHandlerBase, IRequestHandler<MarkExecutionStartedCommand, CommandResult>
 {
     public MarkExecutionStartedCommandHandler(
         IInfrastructureChangeRequestRepository repository,
@@ -12,7 +13,7 @@ public sealed class MarkExecutionStartedCommandHandler : ChangeRequestCommandHan
     {
     }
 
-    public Task<CommandResult> HandleAsync(MarkExecutionStartedCommand command, CancellationToken cancellationToken = default)
+    public Task<CommandResult> Handle(MarkExecutionStartedCommand command, CancellationToken cancellationToken = default)
     {
         return UpdateAsync(
             command.Id,
@@ -20,4 +21,8 @@ public sealed class MarkExecutionStartedCommandHandler : ChangeRequestCommandHan
             "Execution marked as started.",
             cancellationToken);
     }
+
+    public Task<CommandResult> HandleAsync(MarkExecutionStartedCommand command, CancellationToken cancellationToken = default)
+        => Handle(command, cancellationToken);
 }
+

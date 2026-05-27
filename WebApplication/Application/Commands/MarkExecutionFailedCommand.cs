@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using MediatR;
 
 namespace WebApplication.Application.Commands;
 
-public sealed class MarkExecutionFailedCommand
+public sealed class MarkExecutionFailedCommand : IRequest<CommandResult>
 {
     public Guid Id { get; set; }
 

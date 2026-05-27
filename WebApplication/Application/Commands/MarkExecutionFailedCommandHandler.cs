@@ -1,9 +1,10 @@
+using MediatR;
 using WebApplication.Infrastructure.Persistence;
 using WebApplication.Infrastructure.ReadModels;
 
 namespace WebApplication.Application.Commands;
 
-public sealed class MarkExecutionFailedCommandHandler : ChangeRequestCommandHandlerBase
+public sealed class MarkExecutionFailedCommandHandler : ChangeRequestCommandHandlerBase, IRequestHandler<MarkExecutionFailedCommand, CommandResult>
 {
     public MarkExecutionFailedCommandHandler(
         IInfrastructureChangeRequestRepository repository,
@@ -12,7 +13,7 @@ public sealed class MarkExecutionFailedCommandHandler : ChangeRequestCommandHand
     {
     }
 
-    public Task<CommandResult> HandleAsync(MarkExecutionFailedCommand command, CancellationToken cancellationToken = default)
+    public Task<CommandResult> Handle(MarkExecutionFailedCommand command, CancellationToken cancellationToken = default)
     {
         return UpdateAsync(
             command.Id,
@@ -20,4 +21,8 @@ public sealed class MarkExecutionFailedCommandHandler : ChangeRequestCommandHand
             "Execution marked as failed.",
             cancellationToken);
     }
+
+    public Task<CommandResult> HandleAsync(MarkExecutionFailedCommand command, CancellationToken cancellationToken = default)
+        => Handle(command, cancellationToken);
 }
+

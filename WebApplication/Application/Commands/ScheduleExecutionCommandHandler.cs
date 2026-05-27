@@ -1,9 +1,10 @@
+using MediatR;
 using WebApplication.Infrastructure.Persistence;
 using WebApplication.Infrastructure.ReadModels;
 
 namespace WebApplication.Application.Commands;
 
-public sealed class ScheduleExecutionCommandHandler : ChangeRequestCommandHandlerBase
+public sealed class ScheduleExecutionCommandHandler : ChangeRequestCommandHandlerBase, IRequestHandler<ScheduleExecutionCommand, CommandResult>
 {
     public ScheduleExecutionCommandHandler(
         IInfrastructureChangeRequestRepository repository,
@@ -12,7 +13,7 @@ public sealed class ScheduleExecutionCommandHandler : ChangeRequestCommandHandle
     {
     }
 
-    public Task<CommandResult> HandleAsync(ScheduleExecutionCommand command, CancellationToken cancellationToken = default)
+    public Task<CommandResult> Handle(ScheduleExecutionCommand command, CancellationToken cancellationToken = default)
     {
         return UpdateAsync(
             command.Id,
@@ -20,4 +21,8 @@ public sealed class ScheduleExecutionCommandHandler : ChangeRequestCommandHandle
             "Execution scheduled.",
             cancellationToken);
     }
+
+    public Task<CommandResult> HandleAsync(ScheduleExecutionCommand command, CancellationToken cancellationToken = default)
+        => Handle(command, cancellationToken);
 }
+

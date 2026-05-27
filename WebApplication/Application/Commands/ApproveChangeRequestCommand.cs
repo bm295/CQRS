@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using MediatR;
 
 namespace WebApplication.Application.Commands;
 
-public sealed class ApproveChangeRequestCommand
+public sealed class ApproveChangeRequestCommand : IRequest<CommandResult>
 {
     public Guid Id { get; set; }
 

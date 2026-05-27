@@ -1,9 +1,10 @@
+using MediatR;
 using WebApplication.Infrastructure.Persistence;
 using WebApplication.Infrastructure.ReadModels;
 
 namespace WebApplication.Application.Commands;
 
-public sealed class RejectChangeRequestCommandHandler : ChangeRequestCommandHandlerBase
+public sealed class RejectChangeRequestCommandHandler : ChangeRequestCommandHandlerBase, IRequestHandler<RejectChangeRequestCommand, CommandResult>
 {
     public RejectChangeRequestCommandHandler(
         IInfrastructureChangeRequestRepository repository,
@@ -12,7 +13,7 @@ public sealed class RejectChangeRequestCommandHandler : ChangeRequestCommandHand
     {
     }
 
-    public Task<CommandResult> HandleAsync(RejectChangeRequestCommand command, CancellationToken cancellationToken = default)
+    public Task<CommandResult> Handle(RejectChangeRequestCommand command, CancellationToken cancellationToken = default)
     {
         return UpdateAsync(
             command.Id,
@@ -21,3 +22,4 @@ public sealed class RejectChangeRequestCommandHandler : ChangeRequestCommandHand
             cancellationToken);
     }
 }
+

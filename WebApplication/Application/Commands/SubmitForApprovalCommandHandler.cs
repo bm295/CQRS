@@ -1,9 +1,10 @@
+using MediatR;
 using WebApplication.Infrastructure.Persistence;
 using WebApplication.Infrastructure.ReadModels;
 
 namespace WebApplication.Application.Commands;
 
-public sealed class SubmitForApprovalCommandHandler : ChangeRequestCommandHandlerBase
+public sealed class SubmitForApprovalCommandHandler : ChangeRequestCommandHandlerBase, IRequestHandler<SubmitForApprovalCommand, CommandResult>
 {
     public SubmitForApprovalCommandHandler(
         IInfrastructureChangeRequestRepository repository,
@@ -12,7 +13,7 @@ public sealed class SubmitForApprovalCommandHandler : ChangeRequestCommandHandle
     {
     }
 
-    public Task<CommandResult> HandleAsync(SubmitForApprovalCommand command, CancellationToken cancellationToken = default)
+    public Task<CommandResult> Handle(SubmitForApprovalCommand command, CancellationToken cancellationToken = default)
     {
         return UpdateAsync(
             command.Id,
@@ -20,4 +21,8 @@ public sealed class SubmitForApprovalCommandHandler : ChangeRequestCommandHandle
             "Change request submitted for approval.",
             cancellationToken);
     }
+
+    public Task<CommandResult> HandleAsync(SubmitForApprovalCommand command, CancellationToken cancellationToken = default)
+        => Handle(command, cancellationToken);
 }
+

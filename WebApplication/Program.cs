@@ -1,3 +1,4 @@
+using MediatR;
 using WebApplication.Application.Commands;
 using WebApplication.Application.Queries;
 using WebApplication.Infrastructure.Persistence;
@@ -9,6 +10,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IInfrastructureChangeRequestRepository, InMemoryInfrastructureChangeRequestRepository>();
 builder.Services.AddSingleton<IChangeReadModelStore, InMemoryChangeReadModelStore>();
 builder.Services.AddSingleton<ProjectionUpdater>();
+builder.Services.AddMediatR(typeof(CreateChangeRequestCommand).Assembly);
 
 builder.Services.AddScoped<CreateChangeRequestCommandHandler>();
 builder.Services.AddScoped<SubmitForApprovalCommandHandler>();

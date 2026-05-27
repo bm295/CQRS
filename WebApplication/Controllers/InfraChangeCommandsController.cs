@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.Application.Commands;
 using WebApplication.Domain;
@@ -7,34 +8,9 @@ namespace WebApplication.Controllers;
 [Route("infra/changes")]
 public sealed class InfraChangeCommandsController : Controller
 {
-    private readonly CreateChangeRequestCommandHandler _createHandler;
-    private readonly SubmitForApprovalCommandHandler _submitHandler;
-    private readonly ApproveChangeRequestCommandHandler _approveHandler;
-    private readonly RejectChangeRequestCommandHandler _rejectHandler;
-    private readonly ScheduleExecutionCommandHandler _scheduleHandler;
-    private readonly MarkExecutionStartedCommandHandler _startHandler;
-    private readonly MarkExecutionCompletedCommandHandler _completeHandler;
-    private readonly MarkExecutionFailedCommandHandler _failHandler;
+    private readonly IMediator _mediator;
 
-    public InfraChangeCommandsController(
-        CreateChangeRequestCommandHandler createHandler,
-        SubmitForApprovalCommandHandler submitHandler,
-        ApproveChangeRequestCommandHandler approveHandler,
-        RejectChangeRequestCommandHandler rejectHandler,
-        ScheduleExecutionCommandHandler scheduleHandler,
-        MarkExecutionStartedCommandHandler startHandler,
-        MarkExecutionCompletedCommandHandler completeHandler,
-        MarkExecutionFailedCommandHandler failHandler)
-    {
-        _createHandler = createHandler;
-        _submitHandler = submitHandler;
-        _approveHandler = approveHandler;
-        _rejectHandler = rejectHandler;
-        _scheduleHandler = scheduleHandler;
-        _startHandler = startHandler;
-        _completeHandler = completeHandler;
-        _failHandler = failHandler;
-    }
+    public InfraChangeCommandsController(IMediator mediator) { _mediator = mediator; }
 
     [HttpPost("")]
     [ValidateAntiForgeryToken]
@@ -47,7 +23,7 @@ public sealed class InfraChangeCommandsController : Controller
 
         try
         {
-            var result = await _createHandler.HandleAsync(command, cancellationToken);
+            var result = await _mediator.Send(command, cancellationToken);
             TempData["StatusMessage"] = result.Message;
             return RedirectToAction("Details", "InfraPages", new { id = result.Id });
         }
@@ -63,7 +39,7 @@ public sealed class InfraChangeCommandsController : Controller
     public Task<IActionResult> Submit(Guid id, CancellationToken cancellationToken)
     {
         return ExecuteTransitionAsync(
-            () => _submitHandler.HandleAsync(new SubmitForApprovalCommand(id), cancellationToken),
+            () => _mediator.Send(new SubmitForApprovalCommand(id), cancellationToken),
             id);
     }
 
@@ -73,7 +49,7 @@ public sealed class InfraChangeCommandsController : Controller
     {
         command.Id = id;
         return ExecuteTransitionAsync(
-            () => _approveHandler.HandleAsync(command, cancellationToken),
+            () => _mediator.Send(command, cancellationToken),
             id);
     }
 
@@ -83,7 +59,7 @@ public sealed class InfraChangeCommandsController : Controller
     {
         command.Id = id;
         return ExecuteTransitionAsync(
-            () => _rejectHandler.HandleAsync(command, cancellationToken),
+            () => _mediator.Send(command, cancellationToken),
             id);
     }
 
@@ -93,7 +69,7 @@ public sealed class InfraChangeCommandsController : Controller
     {
         command.Id = id;
         return ExecuteTransitionAsync(
-            () => _scheduleHandler.HandleAsync(command, cancellationToken),
+            () => _mediator.Send(command, cancellationToken),
             id);
     }
 
@@ -102,7 +78,7 @@ public sealed class InfraChangeCommandsController : Controller
     public Task<IActionResult> Start(Guid id, CancellationToken cancellationToken)
     {
         return ExecuteTransitionAsync(
-            () => _startHandler.HandleAsync(new MarkExecutionStartedCommand(id), cancellationToken),
+            () => _mediator.Send(new MarkExecutionStartedCommand(id), cancellationToken),
             id);
     }
 
@@ -111,7 +87,7 @@ public sealed class InfraChangeCommandsController : Controller
     public Task<IActionResult> Complete(Guid id, CancellationToken cancellationToken)
     {
         return ExecuteTransitionAsync(
-            () => _completeHandler.HandleAsync(new MarkExecutionCompletedCommand(id), cancellationToken),
+            () => _mediator.Send(new MarkExecutionCompletedCommand(id), cancellationToken),
             id);
     }
 
@@ -121,7 +97,7 @@ public sealed class InfraChangeCommandsController : Controller
     {
         command.Id = id;
         return ExecuteTransitionAsync(
-            () => _failHandler.HandleAsync(command, cancellationToken),
+            () => _mediator.Send(command, cancellationToken),
             id);
     }
 
@@ -151,3 +127,4 @@ public sealed class InfraChangeCommandsController : Controller
         return RedirectToAction("Details", "InfraPages", new { id });
     }
 }
+

@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication.Application.Commands;
 using WebApplication.Application.Queries;
@@ -7,25 +8,9 @@ namespace WebApplication.Controllers;
 
 public sealed class InfraPagesController : Controller
 {
-    private readonly GetChangeRequestByIdQueryHandler _detailsHandler;
-    private readonly ListPendingApprovalsQueryHandler _pendingApprovalsHandler;
-    private readonly ListScheduledChangesQueryHandler _scheduledChangesHandler;
-    private readonly ListFailedChangesQueryHandler _failedChangesHandler;
-    private readonly GetOperationalChangeSummaryQueryHandler _summaryHandler;
+    private readonly IMediator _mediator;
 
-    public InfraPagesController(
-        GetChangeRequestByIdQueryHandler detailsHandler,
-        ListPendingApprovalsQueryHandler pendingApprovalsHandler,
-        ListScheduledChangesQueryHandler scheduledChangesHandler,
-        ListFailedChangesQueryHandler failedChangesHandler,
-        GetOperationalChangeSummaryQueryHandler summaryHandler)
-    {
-        _detailsHandler = detailsHandler;
-        _pendingApprovalsHandler = pendingApprovalsHandler;
-        _scheduledChangesHandler = scheduledChangesHandler;
-        _failedChangesHandler = failedChangesHandler;
-        _summaryHandler = summaryHandler;
-    }
+    public InfraPagesController(IMediator mediator) { _mediator = mediator; }
 
     [HttpGet("/infra/changes/new")]
     public IActionResult Create()
@@ -36,7 +21,7 @@ public sealed class InfraPagesController : Controller
     [HttpGet("/infra/changes/{id:guid}/view")]
     public async Task<IActionResult> Details(Guid id, CancellationToken cancellationToken)
     {
-        var details = await _detailsHandler.HandleAsync(new GetChangeRequestByIdQuery(id), cancellationToken);
+        var details = await _mediator.Send(new GetChangeRequestByIdQuery(id), cancellationToken);
         if (details is null)
         {
             return NotFound();
@@ -57,21 +42,21 @@ public sealed class InfraPagesController : Controller
     [HttpGet("/infra/approvals")]
     public async Task<IActionResult> Approvals(CancellationToken cancellationToken)
     {
-        var results = await _pendingApprovalsHandler.HandleAsync(new ListPendingApprovalsQuery(), cancellationToken);
+        var results = await _mediator.Send(new ListPendingApprovalsQuery(), cancellationToken);
         return View(results);
     }
 
     [HttpGet("/infra/schedule")]
     public async Task<IActionResult> Schedule(CancellationToken cancellationToken)
     {
-        var results = await _scheduledChangesHandler.HandleAsync(new ListScheduledChangesQuery(), cancellationToken);
+        var results = await _mediator.Send(new ListScheduledChangesQuery(), cancellationToken);
         return View(results);
     }
 
     [HttpGet("/infra/failures")]
     public async Task<IActionResult> Failures(CancellationToken cancellationToken)
     {
-        var results = await _failedChangesHandler.HandleAsync(new ListFailedChangesQuery(), cancellationToken);
+        var results = await _mediator.Send(new ListFailedChangesQuery(), cancellationToken);
         return View(results);
     }
 
@@ -81,12 +66,13 @@ public sealed class InfraPagesController : Controller
     {
         var viewModel = new DashboardPageVm
         {
-            Summary = await _summaryHandler.HandleAsync(new GetOperationalChangeSummaryQuery(), cancellationToken),
-            PendingApprovals = await _pendingApprovalsHandler.HandleAsync(new ListPendingApprovalsQuery(), cancellationToken),
-            ScheduledChanges = await _scheduledChangesHandler.HandleAsync(new ListScheduledChangesQuery(), cancellationToken),
-            FailedChanges = await _failedChangesHandler.HandleAsync(new ListFailedChangesQuery(), cancellationToken)
+            Summary = await _mediator.Send(new GetOperationalChangeSummaryQuery(), cancellationToken),
+            PendingApprovals = await _mediator.Send(new ListPendingApprovalsQuery(), cancellationToken),
+            ScheduledChanges = await _mediator.Send(new ListScheduledChangesQuery(), cancellationToken),
+            FailedChanges = await _mediator.Send(new ListFailedChangesQuery(), cancellationToken)
         };
 
         return View(viewModel);
     }
 }
+

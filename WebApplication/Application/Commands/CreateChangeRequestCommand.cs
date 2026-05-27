@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using MediatR;
 
 namespace WebApplication.Application.Commands;
 
-public sealed class CreateChangeRequestCommand
+public sealed class CreateChangeRequestCommand : IRequest<CommandResult>
 {
     [Required]
     [StringLength(120)]
