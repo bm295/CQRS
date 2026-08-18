@@ -1,6 +1,6 @@
 namespace WebApplication.Domain;
 
-public sealed class InfrastructureChangeRequest
+public sealed class InfrastructureChangeRequest : IBelongsToRetailer
 {
     private InfrastructureChangeRequest(
         Guid id,
@@ -21,6 +21,7 @@ public sealed class InfrastructureChangeRequest
     }
 
     public Guid Id { get; }
+    public Guid RetailerId { get; private set; }
     public string Title { get; private set; }
     public string SystemName { get; private set; }
     public string Environment { get; private set; }
