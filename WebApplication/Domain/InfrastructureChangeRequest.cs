@@ -1,3 +1,5 @@
+using Cqrs.RetailerIsolation;
+
 namespace WebApplication.Domain;
 
 public sealed class InfrastructureChangeRequest : IBelongsToRetailer
@@ -30,7 +32,7 @@ public sealed class InfrastructureChangeRequest : IBelongsToRetailer
     public DateTime? ScheduledAtUtc { get; private set; }
     public ChangeStatus Status { get; private set; }
     public string? FailureReason { get; private set; }
-    public DateTime CreatedAtUtc { get; }
+    public DateTime CreatedAtUtc { get; private set; }
     public DateTime UpdatedAtUtc { get; private set; }
 
     public static InfrastructureChangeRequest Create(

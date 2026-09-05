@@ -15,6 +15,18 @@ dotnet run --project WebApplication/WebApplication.csproj
 
 Open `/infra/dashboard`.
 
+## Reusable DLL
+
+`Cqrs.RetailerIsolation.EfCore` is a versioned, independent .NET 10 library that protects retailer-owned EF Core entities during `SaveChanges`.
+
+Build the DLL consumed by ApiDemo with:
+
+```bash
+dotnet build Cqrs.RetailerIsolation.EfCore/Cqrs.RetailerIsolation.EfCore.csproj --configuration Release --output artifacts/lib/net10.0
+```
+
+The current assembly version is `1.0.0.0`. A consuming application must implement `IRetailerContext`, make its entities implement `IBelongsToRetailer`, register `RetailerSaveChangesInterceptor`, and configure a retailer query filter.
+
 ## HTTP Endpoints
 
 Commands:

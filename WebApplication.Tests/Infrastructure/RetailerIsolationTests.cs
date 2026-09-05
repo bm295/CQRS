@@ -1,6 +1,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using Cqrs.RetailerIsolation;
 using WebApplication.Domain;
 using WebApplication.Infrastructure.Persistence;
 

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Cqrs.RetailerIsolation;
 using WebApplication.Domain;
 
 namespace WebApplication.Infrastructure.Persistence;
