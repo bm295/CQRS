@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="vi">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ACCORD · Home</title><link rel="stylesheet" href="/styles.css?v=5"><script src="/app.js?v=4" defer></script></head>
+<body>
+<header><a class="brand" href="#home">A<span>ACCORD</span></a><nav aria-label="Menu chính"><a id="nav-home" href="#home" aria-current="page">Home</a><a id="nav-task" href="#task">Task</a></nav></header>
+<main>
+<section class="panel">
+<div id="workspace"><div class="panel-heading"><h2 id="page-title">Top 5 task của bạn</h2><button id="reload" class="secondary" type="button">Tải lại</button></div><p id="page-description">5 công việc mới nhất trong không gian của bạn.</p><form id="task-form" hidden><label for="title">Thêm công việc</label><div class="actions"><input id="title" required maxlength="200" placeholder="Bạn muốn hoàn thành điều gì?"><button type="submit">Thêm</button></div></form><p id="summary">Đang tải công việc…</p><ul id="tasks"></ul><a id="view-all" class="view-all" href="#task">Xem tất cả công việc →</a></div>
+<p id="message" role="status" aria-live="polite"></p></section>
+</main><footer>ACCORD · Không gian tập trung cho công việc của bạn</footer>
+</body></html>
