@@ -1,8 +1,9 @@
+using MediatR;
 using WebApplication.Infrastructure.ReadModels;
 
 namespace WebApplication.Application.Queries;
 
-public sealed class ListScheduledChangesQueryHandler
+public sealed class ListScheduledChangesQueryHandler : IRequestHandler<ListScheduledChangesQuery, IReadOnlyList<ScheduledChangeVm>>
 {
     private readonly IChangeReadModelStore _readModelStore;
 
@@ -15,4 +16,5 @@ public sealed class ListScheduledChangesQueryHandler
     {
         return _readModelStore.ListScheduledChangesAsync(cancellationToken);
     }
+    public Task<IReadOnlyList<ScheduledChangeVm>> Handle(ListScheduledChangesQuery query, CancellationToken cancellationToken) => HandleAsync(query, cancellationToken);
 }

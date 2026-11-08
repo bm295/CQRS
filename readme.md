@@ -50,6 +50,10 @@ Queries:
 
 ## Notes
 
-- The write repository and projection store are both in-memory for the MVP.
+- The web app uses SQLite for durable writes; operational read models are in memory and rebuilt at startup.
 - Read pages are backed by projected read models, not the aggregate repository.
 - Automated tests cover aggregate transitions and a command/query workflow over the in-memory stores.
+
+## Change Advisor
+
+The web app now persists changes in SQLite and rebuilds operational projections at startup. The previous in-memory implementations remain available for unit tests. Open a change's **AI Change Advisor** to manage its deployment plan, versioned policies, confirmed lessons and evidence-backed readiness analysis. The default evaluator uses rules; an optional HTTPS model adapter is configurable. See [setup, demo, configuration and limitations](docs/change-advisor.md).

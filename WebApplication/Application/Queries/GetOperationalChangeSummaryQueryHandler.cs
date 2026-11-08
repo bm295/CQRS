@@ -1,8 +1,9 @@
+using MediatR;
 using WebApplication.Infrastructure.ReadModels;
 
 namespace WebApplication.Application.Queries;
 
-public sealed class GetOperationalChangeSummaryQueryHandler
+public sealed class GetOperationalChangeSummaryQueryHandler : IRequestHandler<GetOperationalChangeSummaryQuery, OpsSummaryVm>
 {
     private readonly IChangeReadModelStore _readModelStore;
 
@@ -15,4 +16,5 @@ public sealed class GetOperationalChangeSummaryQueryHandler
     {
         return _readModelStore.GetSummaryAsync(cancellationToken);
     }
+    public Task<OpsSummaryVm> Handle(GetOperationalChangeSummaryQuery query, CancellationToken cancellationToken) => HandleAsync(query, cancellationToken);
 }

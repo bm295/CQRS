@@ -1,0 +1,70 @@
+@using WebApplication.Application.AI
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Change Advisor";
+    var change = (WebApplication.Domain.InfrastructureChangeRequest)ViewBag.Change;
+    var plan = (ChangePlan)ViewBag.Plan;
+    var latest = (AnalysisView?)ViewBag.Latest;
+}
+<h1>Change Advisor: @change.Title</h1>
+<p><a href="/infra/changes/@change.Id/view">Back to change</a> · @change.SystemName / @change.Environment / @change.Status</p>
+<p>Advisory only. A human must review policies and approve deployment.</p>
+@if (TempData["AdvisorError"] is string error) { <p role="alert">@error</p> }
+@if (ViewBag.Error is string contextError) { <p role="alert">@contextError</p> }
+<section class="panel">
+<h2>Deployment plan</h2>
+<form method="post" action="/infra/changes/@change.Id/plan">
+@Html.AntiForgeryToken()
+<label>Description<textarea name="description" required maxlength="1500">@plan.Description</textarea></label>
+<label>Implementation<textarea name="implementation" required maxlength="1500">@plan.Implementation</textarea></label>
+<label>Rollback<textarea name="rollback" required maxlength="1500">@plan.Rollback</textarea></label>
+<label>Verification<textarea name="verification" required maxlength="1500">@plan.Verification</textarea></label>
+<button>Save plan</button>
+</form>
+</section>
+<section class="panel">
+<h2>Approved policies for this system/environment</h2>
+<p>Only publish rules reviewed by your team. Updating a policy invalidates earlier analyses.</p>
+@foreach (Knowledge policy in ViewBag.Knowledge)
+{
+<form method="post" action="/infra/changes/@change.Id/knowledge">
+@Html.AntiForgeryToken()
+<input type="hidden" name="knowledgeId" value="@policy.Id" />
+<label>Version @policy.Version<textarea name="text" required maxlength="1500">@policy.Text</textarea></label><button>Publish new version</button>
+</form>
+}
+<form method="post" action="/infra/changes/@change.Id/knowledge">
+@Html.AntiForgeryToken()
+<label>New policy<textarea name="text" required maxlength="1500"></textarea></label><button>Publish approved policy</button>
+</form>
+</section>
+<section class="panel">
+<h2>Lessons from this change</h2>
+@foreach (Lesson lesson in ViewBag.Lessons)
+{
+<p>@lesson.Text · @(lesson.Confirmed ? "Confirmed" : "Awaiting confirmation") · Expires @lesson.ExpiresUtc.ToString("u")</p>
+@if (!lesson.Confirmed) {
+<form method="post" action="/infra/changes/@change.Id/lessons/@lesson.Id/confirm">@Html.AntiForgeryToken()<button>Confirm lesson for reuse</button></form>
+}
+}
+@if (change.Status is WebApplication.Domain.ChangeStatus.Completed or WebApplication.Domain.ChangeStatus.Failed) {
+<form method="post" action="/infra/changes/@change.Id/lessons">@Html.AntiForgeryToken()
+<label>New lesson<textarea name="text" required maxlength="1500"></textarea></label><button>Save draft lesson</button></form>
+}
+</section>
+<section class="panel">
+<h2>Readiness analysis</h2>
+<form method="post" action="/infra/changes/@change.Id/analyses">@Html.AntiForgeryToken()<button>Analyze change</button></form>
+@if (latest is not null) {
+var result = JsonSerializer.Deserialize<AdvisorResult>(latest.Analysis.ResultJson)!;
+var context = JsonSerializer.Deserialize<AdvisorContext>(latest.Analysis.ContextJson)!;
+<p>@latest.Analysis.CreatedUtc.ToString("u") · Mode: @latest.Analysis.Mode</p>
+@if (latest.IsStale) { <p role="alert"><strong>Outdated — analyze again before using this advice.</strong></p> }
+<h3>@result.Readiness</h3>
+<h4>Findings</h4><ul>@foreach (var item in result.Findings) { <li>@item</li> }</ul>
+<h4>Missing information</h4><ul>@foreach (var item in result.MissingInformation) { <li>@item</li> }</ul>
+<h4>Checklist</h4><ul>@foreach (var item in result.Checklist) { <li>@item</li> }</ul>
+<h4>Evidence snapshot</h4>
+@foreach (var evidence in context.Evidence) { <details><summary>@evidence.Source</summary><pre style="white-space:pre-wrap">@evidence.Text</pre></details> }
+}
+</section>
