@@ -1,8 +1,9 @@
+using MediatR;
 using WebApplication.Infrastructure.ReadModels;
 
 namespace WebApplication.Application.Queries;
 
-public sealed class ListPendingApprovalsQueryHandler
+public sealed class ListPendingApprovalsQueryHandler : IRequestHandler<ListPendingApprovalsQuery, IReadOnlyList<PendingApprovalVm>>
 {
     private readonly IChangeReadModelStore _readModelStore;
 
@@ -15,4 +16,5 @@ public sealed class ListPendingApprovalsQueryHandler
     {
         return _readModelStore.ListPendingApprovalsAsync(cancellationToken);
     }
+    public Task<IReadOnlyList<PendingApprovalVm>> Handle(ListPendingApprovalsQuery query, CancellationToken cancellationToken) => HandleAsync(query, cancellationToken);
 }

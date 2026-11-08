@@ -1,8 +1,9 @@
+using MediatR;
 using WebApplication.Infrastructure.ReadModels;
 
 namespace WebApplication.Application.Queries;
 
-public sealed class GetChangeRequestByIdQueryHandler
+public sealed class GetChangeRequestByIdQueryHandler : IRequestHandler<GetChangeRequestByIdQuery, ChangeRequestDetailsVm?>
 {
     private readonly IChangeReadModelStore _readModelStore;
 
@@ -15,4 +16,5 @@ public sealed class GetChangeRequestByIdQueryHandler
     {
         return _readModelStore.GetByIdAsync(query.Id, cancellationToken);
     }
+    public Task<ChangeRequestDetailsVm?> Handle(GetChangeRequestByIdQuery query, CancellationToken cancellationToken) => HandleAsync(query, cancellationToken);
 }
